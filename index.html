@@ -31,7 +31,7 @@
             <p class="text-center text-gray-600 mb-6 font-bold text-sm">
                 かいた絵の写真を撮るか選んで、<br>音声で名前をつけてバトルしよう！
             </p>
-            <button onclick="handleStartClick()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
+            <button onclick="goToUpload()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
                 ゲームをはじめる！
             </button>
         </div>
@@ -70,7 +70,7 @@
                 </div>
 
                 <button onclick="goToGame()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-lg py-3 rounded-full shadow-lg transform active:scale-95 transition">
-                    バトルへすする！
+                    バトルへすすむ！
                 </button>
             </div>
         </div>
@@ -103,23 +103,6 @@
 
     </main>
 
-    <!-- リワード広告ポップアップモック -->
-    <div id="adModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
-            <div class="text-4xl mb-2">📺</div>
-            <h3 class="text-lg font-extrabold text-gray-800 mb-2">もっとあそぼう！</h3>
-            <p class="text-xs text-gray-500 mb-6">
-                2回目以降に新しいキャラを作るには、動画をみてね！（モック広告）
-            </p>
-            <button onclick="watchAd()" class="w-full bg-green-500 hover:bg-green-600 text-white font-extrabold py-3 rounded-full shadow-md mb-2">
-                ▶ 動画をみたよ！（すすむ）
-            </button>
-            <button onclick="closeAdModal()" class="text-gray-400 text-xs font-bold py-1">
-                やめる
-            </button>
-        </div>
-    </div>
-
     <footer class="w-full max-w-md text-center text-xs text-gray-500 py-2">
         &copy; 2026 おえかきバトル プロトタイプ
     </footer>
@@ -128,26 +111,11 @@
     <script>
         let characterImage = null;
         let playerHp = 100, enemyHp = 100;
-        let playerX = 50, enemyX = 200;
+        let playerX = 60, enemyX = 200;
         let isAttacking = false;
         let animationFrameId = null;
 
-        function handleStartClick() {
-            const count = parseInt(localStorage.getItem('drawingCount') || '0');
-            if (count >= 1) {
-                document.getElementById('adModal').classList.remove('hidden');
-            } else {
-                switchView('view-upload');
-            }
-        }
-
-        function closeAdModal() {
-            document.getElementById('adModal').classList.add('hidden');
-        }
-
-        function watchAd() {
-            closeAdModal();
-            localStorage.setItem('drawingCount', '0');
+        function goToUpload() {
             switchView('view-upload');
         }
 
@@ -204,9 +172,6 @@
         }
 
         function goToGame() {
-            let count = parseInt(localStorage.getItem('drawingCount') || '0');
-            localStorage.setItem('drawingCount', count + 1);
-
             const nameInput = document.getElementById('charNameInput').value;
             document.getElementById('displayCharName').innerText = nameInput ? nameInput : "マイキャラ";
 
@@ -241,7 +206,7 @@
                     ctx.fillRect(playerX, 110, 50, 50);
                 }
 
-                // 敵キャラ（スライム風の仮キャラ）描画
+                // 敵キャラ描画
                 ctx.fillStyle = "#ef4444";
                 ctx.beginPath();
                 ctx.arc(enemyX + 25, 145, 25, 0, Math.PI * 2);
@@ -260,7 +225,7 @@
         function playerAttack() {
             if (isAttacking) return;
             isAttacking = true;
-            playerX += 40; // 前進攻撃
+            playerX += 40;
 
             setTimeout(() => {
                 enemyHp = Math.max(0, enemyHp - 20);
