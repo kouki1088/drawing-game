@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ おえかきじゃんけんバトル ✨</title>
+    <title>✨ おえかきバトル ✨</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -18,149 +18,104 @@
 
     <!-- ヘッダー -->
     <header class="w-full max-w-md text-center py-2">
-        <h1 class="text-3xl font-extrabold text-pink-500 drop-shadow-md">✨ おえかきジャンケン ✨</h1>
-        <p class="text-sm text-indigo-600 font-bold mt-1">じぶんのデータでじゃんけんバトル！</p>
+        <h1 class="text-3xl font-extrabold text-pink-500 drop-shadow-md">✨ おえかきバトル ✨</h1>
+        <p class="text-sm text-indigo-600 font-bold mt-1">じぶんのえでバトルしよう！</p>
     </header>
 
     <!-- メインコンテンツエリア -->
-    <main class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center my-auto min-h-[480px]">
+    <main class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center my-auto min-h-[450px]">
 
         <!-- 1. ホーム画面 -->
         <div id="view-home" class="flex flex-col items-center w-full">
-            <div class="text-6xl mb-4 animate-bounce">✌️🎨</div>
+            <div class="text-6xl mb-4 animate-bounce">🎨⚔️</div>
             <p class="text-center text-gray-600 mb-6 font-bold text-sm">
-                絵のデータや音声データを選んで、<br>じゃんけんバトルに挑戦しよう！
+                かいた絵の写真を撮るか選んで、<br>音声で名前をつけてバトルしよう！
             </p>
-            <button onclick="handleStartClick()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
+            <button onclick="goToUpload()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
                 ゲームをはじめる！
             </button>
         </div>
 
-        <!-- 2. キャラクター作成画面（データ読み込み） -->
+        <!-- 2. アップロード・撮影＆音声入力画面 -->
         <div id="view-upload" class="hidden flex flex-col items-center w-full">
-            <h2 class="text-xl font-bold text-indigo-600 mb-3">キャラのデータを選んでね！</h2>
+            <h2 class="text-xl font-bold text-indigo-600 mb-3">キャラをしょうかいしてね！</h2>
             
-            <!-- 画像データ選択・カメラ撮影ボタン -->
-            <div class="flex gap-2 w-full mb-3">
-                <label class="flex-1 border-2 border-dashed border-pink-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-pink-50 cursor-pointer hover:bg-pink-100 transition shadow-sm">
-                    <span class="text-3xl mb-1">📷</span>
-                    <span class="text-xs font-bold text-pink-500 text-center">写真を撮る<br>(絵をキャラ化)</span>
+            <!-- 写真選択・カメラ撮影ボタン -->
+            <div class="flex gap-2 w-full mb-4">
+                <label class="flex-1 border-2 border-dashed border-pink-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-pink-50 cursor-pointer hover:bg-pink-100 transition">
+                    <span class="text-2xl mb-1">📷</span>
+                    <span class="text-xs font-bold text-pink-500">写真を撮る</span>
                     <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="onImageSelected(event)">
                 </label>
-                <label class="flex-1 border-2 border-dashed border-indigo-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-indigo-50 cursor-pointer hover:bg-indigo-100 transition shadow-sm">
-                    <span class="text-3xl mb-1">🖼️</span>
-                    <span class="text-xs font-bold text-indigo-500 text-center">画像データを選ぶ<br>(絵をキャラ化)</span>
+                <label class="flex-1 border-2 border-dashed border-indigo-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-indigo-50 cursor-pointer hover:bg-indigo-100 transition">
+                    <span class="text-2xl mb-1">🖼️</span>
+                    <span class="text-xs font-bold text-indigo-500">画像を選ぶ</span>
                     <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="onImageSelected(event)">
                 </label>
             </div>
 
-            <!-- 音声データアップロード -->
-             <div class="w-full mb-4">
-                 <label class="w-full border-2 border-dashed border-purple-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-purple-50 cursor-pointer hover:bg-purple-100 transition shadow-sm">
-                    <span class="text-3xl mb-1">🎵</span>
-                    <span class="text-xs font-bold text-purple-500">音声データを選ぶ (登場時の音)</span>
-                    <input type="file" id="audioInput" accept="audio/*" class="hidden" onchange="onAudioSelected(event)">
-                 </label>
-                 <p id="audioStatus" class="text-xs text-center text-gray-500 mt-1 hidden">✅ 音声データがセットされました！</p>
-             </div>
-
-            <!-- プレビューとバトル開始ボタン -->
+            <!-- プレビューと音声入力 -->
             <div id="previewContainer" class="hidden flex flex-col items-center w-full">
-                <div class="mb-4">
-                    <img id="imagePreview" class="w-28 h-28 object-contain border-2 border-indigo-300 rounded-xl bg-white shadow-md">
+                <img id="imagePreview" class="w-24 h-24 object-contain border-2 border-indigo-300 rounded-xl bg-white shadow-md mb-3">
+                
+                <!-- 音声入力エリア -->
+                <div class="w-full bg-indigo-50 rounded-2xl p-3 mb-4 flex flex-col items-center">
+                    <p class="text-xs font-bold text-indigo-600 mb-2">🎤 マイクに向かって名前や必殺技を言ってね！</p>
+                    <div class="flex gap-2 w-full">
+                        <button onclick="startVoiceInput()" id="micBtn" class="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xs py-2 px-3 rounded-full shadow transition">
+                            音声入力をはじめる
+                        </button>
+                    </div>
+                    <input type="text" id="charNameInput" placeholder="キャラ名（例: ぽよまる）" class="w-full mt-2 text-center text-sm font-bold border border-indigo-200 rounded-xl py-1 px-2 bg-white outline-none focus:ring-2 focus:ring-indigo-400">
                 </div>
+
                 <button onclick="goToGame()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-lg py-3 rounded-full shadow-lg transform active:scale-95 transition">
                     バトルへすすむ！
                 </button>
             </div>
-            
-            <button onclick="backToHome()" class="mt-4 text-gray-400 hover:text-gray-600 text-xs font-bold py-1">
-                ホームにもどる
-            </button>
         </div>
 
-        <!-- 3. じゃんけんバトル画面 -->
+        <!-- 3. バトル画面 -->
         <div id="view-game" class="hidden flex flex-col items-center w-full relative">
-            <!-- HP表示 -->
-            <div class="flex justify-between w-full mb-2 px-2 text-xs font-bold text-gray-600">
-                <span>プレイヤー HP: <span id="playerHp" class="text-green-500 text-base">100</span></span>
+            <div class="flex justify-between w-full mb-1 px-2 text-xs font-bold text-gray-600">
+                <span>HP: <span id="playerHp" class="text-green-500 text-base">100</span></span>
+                <span id="displayCharName" class="text-indigo-600 font-extrabold">マイキャラ</span>
                 <span>てき HP: <span id="enemyHp" class="text-red-500 text-base">100</span></span>
             </div>
             
-            <!-- バトルステージ（キャンバス） -->
-            <canvas id="gameCanvas" width="300" height="150" class="bg-indigo-900 rounded-2xl shadow-inner border-4 border-indigo-300 mb-3"></canvas>
+            <!-- バトル用キャンバス -->
+            <canvas id="gameCanvas" width="300" height="240" class="bg-indigo-900 rounded-2xl shadow-inner border-4 border-indigo-300"></canvas>
             
-            <!-- バトル中のメッセージ・結果表示 -->
-            <div id="battleResultText" class="text-sm font-extrabold text-indigo-600 mb-3 h-6 text-center">
-                じゃんけんの手をえらんでね！
-            </div>
-
-            <!-- じゃんけんの手を選ぶボタン群 -->
-            <div class="grid grid-cols-3 gap-2 w-full">
-                <button onclick="playerJanken('rock')" class="bg-red-500 hover:bg-red-600 text-white font-extrabold py-3 rounded-2xl shadow text-sm active:scale-95 transition flex flex-col items-center">
-                    <span class="text-xl">✊</span>
-                    <span class="text-xs mt-1">グー</span>
+            <!-- アクションボタン -->
+            <div class="flex gap-2 w-full mt-3">
+                <button onclick="playerAttack()" class="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-extrabold py-2 rounded-full shadow text-sm active:scale-95 transition">
+                    ⚔️ こうげき！
                 </button>
-                <button onclick="playerJanken('scissors')" class="bg-blue-500 hover:bg-blue-600 text-white font-extrabold py-3 rounded-2xl shadow text-sm active:scale-95 transition flex flex-col items-center">
-                    <span class="text-xl">✌️</span>
-                    <span class="text-xs mt-1">チョキ</span>
-                </button>
-                <button onclick="playerJanken('paper')" class="bg-green-500 hover:bg-green-600 text-white font-extrabold py-3 rounded-2xl shadow text-sm active:scale-95 transition flex flex-col items-center">
-                    <span class="text-xl">✋</span>
-                    <span class="text-xs mt-1">パー</span>
+                <button onclick="playerSpecial()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-2 rounded-full shadow text-sm active:scale-95 transition">
+                    🔥 ひっさつわざ！
                 </button>
             </div>
 
-            <button onclick="backToHome()" class="mt-4 text-gray-400 hover:text-gray-600 text-xs font-bold py-1">
+            <button onclick="backToHome()" class="mt-2 text-gray-400 hover:text-gray-600 text-xs font-bold py-1">
                 ホームにもどる
             </button>
         </div>
 
     </main>
 
-    <!-- リワード広告ポップアップモック -->
-    <div id="adModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
-            <div class="text-4xl mb-2">📺</div>
-            <h3 class="text-lg font-extrabold text-gray-800 mb-2">もっとあそぼう！</h3>
-            <p class="text-xs text-gray-500 mb-6">
-                2回目以降に新しいキャラを作るには、動画をみてね！（モック広告）
-            </p>
-            <button onclick="watchAd()" class="w-full bg-green-500 hover:bg-green-600 text-white font-extrabold py-3 rounded-full shadow-md mb-2">
-                ▶ 動画をみたよ！（すすむ）
-            </button>
-            <button onclick="closeAdModal()" class="text-gray-400 text-xs font-bold py-1">
-                やめる
-            </button>
-        </div>
-    </div>
-
     <footer class="w-full max-w-md text-center text-xs text-gray-500 py-2">
-        &copy; 2026 おえかきじゃんけんバトル
+        &copy; 2026 おえかきバトル プロトタイプ
     </footer>
 
     <!-- スクリプト制御 -->
     <script>
         let characterImage = null;
-        let characterAudio = null;
         let playerHp = 100, enemyHp = 100;
+        let playerX = 60, enemyX = 200;
+        let isAttacking = false;
+        let animationFrameId = null;
 
-        function handleStartClick() {
-            const count = parseInt(localStorage.getItem('drawingCount') || '0');
-            if (count >= 1) {
-                document.getElementById('adModal').classList.remove('hidden');
-            } else {
-                switchView('view-upload');
-            }
-        }
-
-        function closeAdModal() {
-            document.getElementById('adModal').classList.add('hidden');
-        }
-
-        function watchAd() {
-            closeAdModal();
-            localStorage.setItem('drawingCount', '0');
+        function goToUpload() {
             switchView('view-upload');
         }
 
@@ -171,7 +126,6 @@
             document.getElementById(viewId).classList.remove('hidden');
         }
 
-        // 画像データの読み込み処理
         function onImageSelected(event) {
             const file = event.target.files[0];
             if (file) {
@@ -188,20 +142,38 @@
                 reader.readAsDataURL(file);
             }
         }
-        
-        // 音声データの読み込み処理
-        function onAudioSelected(event) {
-            const file = event.target.files[0];
-            if(file) {
-                characterAudio = new Audio(URL.createObjectURL(file));
-                const statusEl = document.getElementById('audioStatus');
-                statusEl.classList.remove('hidden');
+
+        // 音声入力（Web Speech API）
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('お使いのブラウザは音声入力に対応していません。手動で入力してね！');
+                return;
             }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP';
+            const micBtn = document.getElementById('micBtn');
+            micBtn.innerText = "Listening... 🎤";
+            micBtn.classList.add('bg-red-500');
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('charNameInput').value = transcript;
+                micBtn.innerText = "音声入力をはじめる";
+                micBtn.classList.remove('bg-red-500');
+            };
+
+            recognition.onerror = function() {
+                micBtn.innerText = "音声入力をはじめる";
+                micBtn.classList.remove('bg-red-500');
+            };
+
+            recognition.start();
         }
 
         function goToGame() {
-            let count = parseInt(localStorage.getItem('drawingCount') || '0');
-            localStorage.setItem('drawingCount', count + 1);
+            const nameInput = document.getElementById('charNameInput').value;
+            document.getElementById('displayCharName').innerText = nameInput ? nameInput : "マイキャラ";
 
             switchView('view-game');
             startBattle();
@@ -210,84 +182,82 @@
         function startBattle() {
             playerHp = 100;
             enemyHp = 100;
+            playerX = 60;
+            enemyX = 200;
             updateHpDisplay();
-            document.getElementById('battleResultText').innerText = "じゃんけんの手をえらんでね！";
-            drawBattleScene("?", "?");
-            
-            // バトル開始時に、アップロードした音声データがあれば再生する
-            if(characterAudio) {
-                characterAudio.play().catch(e => console.log("Audio play failed:", e));
-            }
-        }
 
-        function drawBattleScene(playerHandSymbol, enemyHandSymbol) {
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 背景ステージ
-            ctx.fillStyle = "#312e81";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#4338ca";
-            ctx.fillRect(0, 110, canvas.width, 40); // 床
+                // 背景ステージ
+                ctx.fillStyle = "#312e81";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#4338ca";
+                ctx.fillRect(0, 180, canvas.width, 60); // 床
 
-            // プレイヤーキャラ描画
-            if (characterImage) {
-                ctx.drawImage(characterImage, 50, 45, 55, 55);
-            } else {
-                ctx.fillStyle = "#ec4899";
-                ctx.fillRect(50, 50, 45, 45);
+                // プレイヤーキャラ描画
+                if (characterImage) {
+                    ctx.drawImage(characterImage, playerX, 110, 60, 60);
+                } else {
+                    ctx.fillStyle = "#ec4899";
+                    ctx.fillRect(playerX, 110, 50, 50);
+                }
+
+                // 敵キャラ描画
+                ctx.fillStyle = "#ef4444";
+                ctx.beginPath();
+                ctx.arc(enemyX + 25, 145, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#fff";
+                ctx.font = "12px sans-serif";
+                ctx.fillText("敵ボス", enemyX + 10, 105);
+
+                animationFrameId = requestAnimationFrame(loop);
             }
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 12px sans-serif";
-            ctx.fillText("プレイヤー (" + playerHandSymbol + ")", 40, 35);
 
-            // 敵キャラ描画
-            ctx.fillStyle = "#ef4444";
-            ctx.beginPath();
-            ctx.arc(220, 72, 25, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "#fff";
-            ctx.fillText("てき (" + enemyHandSymbol + ")", 195, 35);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            loop();
         }
 
-        function playerJanken(playerChoice) {
-            const choices = ['rock', 'scissors', 'paper'];
-            const symbols = { 'rock': '✊ グー', 'scissors': '✌️ チョキ', 'paper': '✋ パー' };
-            const enemyChoice = choices[Math.floor(Math.random() * choices.length)];
-
-            drawBattleScene(symbols[playerChoice], symbols[enemyChoice]);
-
-            let resultText = "";
-            if (playerChoice === enemyChoice) {
-                resultText = `あいこ！ お互い ${symbols[playerChoice]} でした！`;
-            } else if (
-                (playerChoice === 'rock' && enemyChoice === 'scissors') ||
-                (playerChoice === 'scissors' && enemyChoice === 'paper') ||
-                (playerChoice === 'paper' && enemyChoice === 'rock')
-            ) {
-                let damage = 35;
-                enemyHp = Math.max(0, enemyHp - damage);
-                resultText = `🎉 かち！ あなたの攻撃が決まった！（-${damage}ダメージ）`;
-            } else {
-                let damage = 25;
-                playerHp = Math.max(0, playerHp - damage);
-                resultText = `💥 まけ… 敵の反撃を受けた！（-${damage}ダメージ）`;
-            }
-
-            updateHpDisplay();
-            document.getElementById('battleResultText').innerText = resultText;
+        function playerAttack() {
+            if (isAttacking) return;
+            isAttacking = true;
+            playerX += 40;
 
             setTimeout(() => {
-                if (enemyHp <= 0) {
-                    alert("🎉 ゆうしゃのしょうり！ モンスターをたおしたぞ！");
-                    backToHome();
-                } else if (playerHp <= 0) {
-                    alert("💥 まけてしまった… もういちど挑戦してね！");
-                    backToHome();
-                }
+                enemyHp = Math.max(0, enemyHp - 20);
+                updateHpDisplay();
+                playerX -= 40;
+                isAttacking = false;
+                checkBattleEnd();
+                if (enemyHp > 0) enemyTurn();
+            }, 200);
+        }
+
+        function playerSpecial() {
+            if (isAttacking) return;
+            isAttacking = true;
+            playerX += 70;
+
+            setTimeout(() => {
+                enemyHp = Math.max(0, enemyHp - 45);
+                updateHpDisplay();
+                playerX -= 70;
+                isAttacking = false;
+                checkBattleEnd();
+                if (enemyHp > 0) enemyTurn();
             }, 300);
+        }
+
+        function enemyTurn() {
+            setTimeout(() => {
+                playerHp = Math.max(0, playerHp - 15);
+                updateHpDisplay();
+                checkBattleEnd();
+            }, 600);
         }
 
         function updateHpDisplay() {
@@ -295,7 +265,18 @@
             document.getElementById('enemyHp').innerText = enemyHp;
         }
 
+        function checkBattleEnd() {
+            if (enemyHp <= 0) {
+                alert("🎉 ゆうしゃのしょうり！ おめでとう！");
+                backToHome();
+            } else if (playerHp <= 0) {
+                alert("💥 まけてしまった… もういちどちょうせんしよう！");
+                backToHome();
+            }
+        }
+
         function backToHome() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
             switchView('view-home');
         }
     </script>
