@@ -19,7 +19,7 @@
     <!-- ヘッダー -->
     <header class="w-full max-w-md text-center py-2">
         <h1 class="text-3xl font-extrabold text-pink-500 drop-shadow-md">✨ おえかきジャンケン ✨</h1>
-        <p class="text-sm text-indigo-600 font-bold mt-1">じぶんのえでじゃんけんバトル！</p>
+        <p class="text-sm text-indigo-600 font-bold mt-1">じぶんのデータでじゃんけんバトル！</p>
     </header>
 
     <!-- メインコンテンツエリア -->
@@ -29,39 +29,39 @@
         <div id="view-home" class="flex flex-col items-center w-full">
             <div class="text-6xl mb-4 animate-bounce">✌️🎨</div>
             <p class="text-center text-gray-600 mb-6 font-bold text-sm">
-                かいた絵の写真を撮るか選んで、<br>じゃんけんバトルに挑戦しよう！
+                絵のデータや音声データを選んで、<br>じゃんけんバトルに挑戦しよう！
             </p>
             <button onclick="handleStartClick()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
                 ゲームをはじめる！
             </button>
         </div>
 
-        <!-- 2. キャラクター作成画面（写真撮影 / 画像選択）※名前の音声入力なし -->
+        <!-- 2. キャラクター作成画面（データ読み込み） -->
         <div id="view-upload" class="hidden flex flex-col items-center w-full">
-            <h2 class="text-xl font-bold text-indigo-600 mb-3">キャラの絵をえらんでね！</h2>
+            <h2 class="text-xl font-bold text-indigo-600 mb-3">キャラのデータを選んでね！</h2>
             
-            <!-- 写真選択・カメラ撮影ボタン -->
-            <div class="flex gap-2 w-full mb-4">
+            <!-- 画像データ選択・カメラ撮影ボタン -->
+            <div class="flex gap-2 w-full mb-3">
                 <label class="flex-1 border-2 border-dashed border-pink-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-pink-50 cursor-pointer hover:bg-pink-100 transition shadow-sm">
                     <span class="text-3xl mb-1">📷</span>
-                    <span class="text-xs font-bold text-pink-500">写真を撮る</span>
+                    <span class="text-xs font-bold text-pink-500 text-center">写真を撮る<br>(絵をキャラ化)</span>
                     <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="onImageSelected(event)">
                 </label>
                 <label class="flex-1 border-2 border-dashed border-indigo-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-indigo-50 cursor-pointer hover:bg-indigo-100 transition shadow-sm">
                     <span class="text-3xl mb-1">🖼️</span>
-                    <span class="text-xs font-bold text-indigo-500">画像を選ぶ</span>
+                    <span class="text-xs font-bold text-indigo-500 text-center">画像データを選ぶ<br>(絵をキャラ化)</span>
                     <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="onImageSelected(event)">
                 </label>
             </div>
 
-            <!-- 音声ファイルアップロード追加 -->
+            <!-- 音声データアップロード -->
              <div class="w-full mb-4">
                  <label class="w-full border-2 border-dashed border-purple-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-purple-50 cursor-pointer hover:bg-purple-100 transition shadow-sm">
                     <span class="text-3xl mb-1">🎵</span>
-                    <span class="text-xs font-bold text-purple-500">音声データを選ぶ(オプション)</span>
+                    <span class="text-xs font-bold text-purple-500">音声データを選ぶ (登場時の音)</span>
                     <input type="file" id="audioInput" accept="audio/*" class="hidden" onchange="onAudioSelected(event)">
                  </label>
-                 <p id="audioStatus" class="text-xs text-center text-gray-500 mt-1 hidden">音声セット完了！</p>
+                 <p id="audioStatus" class="text-xs text-center text-gray-500 mt-1 hidden">✅ 音声データがセットされました！</p>
              </div>
 
             <!-- プレビューとバトル開始ボタン -->
@@ -69,7 +69,6 @@
                 <div class="mb-4">
                     <img id="imagePreview" class="w-28 h-28 object-contain border-2 border-indigo-300 rounded-xl bg-white shadow-md">
                 </div>
-
                 <button onclick="goToGame()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-lg py-3 rounded-full shadow-lg transform active:scale-95 transition">
                     バトルへすすむ！
                 </button>
@@ -146,7 +145,6 @@
         let characterAudio = null;
         let playerHp = 100, enemyHp = 100;
 
-        // 回数制限のチェックと画面切り替え（ここを修正しました）
         function handleStartClick() {
             const count = parseInt(localStorage.getItem('drawingCount') || '0');
             if (count >= 1) {
@@ -166,7 +164,6 @@
             switchView('view-upload');
         }
 
-        // 画面の表示非表示を切り替える関数（ここも修正しました）
         function switchView(viewId) {
             document.getElementById('view-home').classList.add('hidden');
             document.getElementById('view-upload').classList.add('hidden');
@@ -174,6 +171,7 @@
             document.getElementById(viewId).classList.remove('hidden');
         }
 
+        // 画像データの読み込み処理
         function onImageSelected(event) {
             const file = event.target.files[0];
             if (file) {
@@ -191,6 +189,7 @@
             }
         }
         
+        // 音声データの読み込み処理
         function onAudioSelected(event) {
             const file = event.target.files[0];
             if(file) {
@@ -214,6 +213,8 @@
             updateHpDisplay();
             document.getElementById('battleResultText').innerText = "じゃんけんの手をえらんでね！";
             drawBattleScene("?", "?");
+            
+            // バトル開始時に、アップロードした音声データがあれば再生する
             if(characterAudio) {
                 characterAudio.play().catch(e => console.log("Audio play failed:", e));
             }
