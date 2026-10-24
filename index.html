@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ おえかきバトル ✨</title>
+    <title>✨ おえかきじゃんけんバトル ✨</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -18,25 +18,25 @@
 
     <!-- ヘッダー -->
     <header class="w-full max-w-md text-center py-2">
-        <h1 class="text-3xl font-extrabold text-pink-500 drop-shadow-md">✨ おえかきバトル ✨</h1>
-        <p class="text-sm text-indigo-600 font-bold mt-1">じぶんのえでバトルしよう！</p>
+        <h1 class="text-3xl font-extrabold text-pink-500 drop-shadow-md">✨ おえかきジャンケン ✨</h1>
+        <p class="text-sm text-indigo-600 font-bold mt-1">じぶんのえでじゃんけんバトル！</p>
     </header>
 
     <!-- メインコンテンツエリア -->
-    <main class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center my-auto min-h-[450px]">
+    <main class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 flex flex-col items-center justify-center my-auto min-h-[480px]">
 
         <!-- 1. ホーム画面 -->
         <div id="view-home" class="flex flex-col items-center w-full">
-            <div class="text-6xl mb-4 animate-bounce">🎨⚔️</div>
+            <div class="text-6xl mb-4 animate-bounce">✌️🎨</div>
             <p class="text-center text-gray-600 mb-6 font-bold text-sm">
-                かいた絵の写真を撮るか選んで、<br>すぐにバトルを始めよう！
+                かいた絵の写真を撮るか選んで、<br>じゃんけんバトルに挑戦しよう！
             </p>
             <button onclick="handleStartClick()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
                 ゲームをはじめる！
             </button>
         </div>
 
-        <!-- 2. キャラクター作成画面（写真撮影 / 画像選択） -->
+        <!-- 2. キャラクター作成画面（写真撮影 / 画像選択）※名前の音声入力なし -->
         <div id="view-upload" class="hidden flex flex-col items-center w-full">
             <h2 class="text-xl font-bold text-indigo-600 mb-3">キャラの絵をえらんでね！</h2>
             
@@ -54,6 +54,16 @@
                 </label>
             </div>
 
+            <!-- 音声ファイルアップロード追加 -->
+             <div class="w-full mb-4">
+                 <label class="w-full border-2 border-dashed border-purple-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-purple-50 cursor-pointer hover:bg-purple-100 transition shadow-sm">
+                    <span class="text-3xl mb-1">🎵</span>
+                    <span class="text-xs font-bold text-purple-500">音声データを選ぶ(オプション)</span>
+                    <input type="file" id="audioInput" accept="audio/*" class="hidden" onchange="onAudioSelected(event)">
+                 </label>
+                 <p id="audioStatus" class="text-xs text-center text-gray-500 mt-1 hidden">音声セット完了！</p>
+             </div>
+
             <!-- プレビューとバトル開始ボタン -->
             <div id="previewContainer" class="hidden flex flex-col items-center w-full">
                 <div class="mb-4">
@@ -70,35 +80,46 @@
             </button>
         </div>
 
-        <!-- 3. バトル画面 -->
+        <!-- 3. じゃんけんバトル画面 -->
         <div id="view-game" class="hidden flex flex-col items-center w-full relative">
-            <div class="flex justify-between w-full mb-1 px-2 text-xs font-bold text-gray-600">
-                <span>HP: <span id="playerHp" class="text-green-500 text-base">100</span></span>
-                <span id="displayCharName" class="text-indigo-600 font-extrabold">マイキャラ</span>
+            <!-- HP表示 -->
+            <div class="flex justify-between w-full mb-2 px-2 text-xs font-bold text-gray-600">
+                <span>プレイヤー HP: <span id="playerHp" class="text-green-500 text-base">100</span></span>
                 <span>てき HP: <span id="enemyHp" class="text-red-500 text-base">100</span></span>
             </div>
             
-            <!-- バトル用キャンバス -->
-            <canvas id="gameCanvas" width="300" height="240" class="bg-indigo-900 rounded-2xl shadow-inner border-4 border-indigo-300"></canvas>
+            <!-- バトルステージ（キャンバス） -->
+            <canvas id="gameCanvas" width="300" height="150" class="bg-indigo-900 rounded-2xl shadow-inner border-4 border-indigo-300 mb-3"></canvas>
             
-            <!-- アクションボタン -->
-            <div class="flex gap-2 w-full mt-3">
-                <button onclick="playerAttack()" class="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-extrabold py-2 rounded-full shadow text-sm active:scale-95 transition">
-                    ⚔️ こうげき！
+            <!-- バトル中のメッセージ・結果表示 -->
+            <div id="battleResultText" class="text-sm font-extrabold text-indigo-600 mb-3 h-6 text-center">
+                じゃんけんの手をえらんでね！
+            </div>
+
+            <!-- じゃんけんの手を選ぶボタン群 -->
+            <div class="grid grid-cols-3 gap-2 w-full">
+                <button onclick="playerJanken('rock')" class="bg-red-500 hover:bg-red-600 text-white font-extrabold py-3 rounded-2xl shadow text-sm active:scale-95 transition flex flex-col items-center">
+                    <span class="text-xl">✊</span>
+                    <span class="text-xs mt-1">グー</span>
                 </button>
-                <button onclick="playerSpecial()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-2 rounded-full shadow text-sm active:scale-95 transition">
-                    🔥 ひっさつわざ！
+                <button onclick="playerJanken('scissors')" class="bg-blue-500 hover:bg-blue-600 text-white font-extrabold py-3 rounded-2xl shadow text-sm active:scale-95 transition flex flex-col items-center">
+                    <span class="text-xl">✌️</span>
+                    <span class="text-xs mt-1">チョキ</span>
+                </button>
+                <button onclick="playerJanken('paper')" class="bg-green-500 hover:bg-green-600 text-white font-extrabold py-3 rounded-2xl shadow text-sm active:scale-95 transition flex flex-col items-center">
+                    <span class="text-xl">✋</span>
+                    <span class="text-xs mt-1">パー</span>
                 </button>
             </div>
 
-            <button onclick="backToHome()" class="mt-2 text-gray-400 hover:text-gray-600 text-xs font-bold py-1">
+            <button onclick="backToHome()" class="mt-4 text-gray-400 hover:text-gray-600 text-xs font-bold py-1">
                 ホームにもどる
             </button>
         </div>
 
     </main>
 
-    <!-- リワード広告ポップアップモック（2回目以降用） -->
+    <!-- リワード広告ポップアップモック -->
     <div id="adModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
             <div class="text-4xl mb-2">📺</div>
@@ -116,170 +137,11 @@
     </div>
 
     <footer class="w-full max-w-md text-center text-xs text-gray-500 py-2">
-        &copy; 2026 おえかきバトル プロトタイプ
+        &copy; 2026 おえかきじゃんけんバトル
     </footer>
 
     <!-- スクリプト制御 -->
     <script>
         let characterImage = null;
-        let playerHp = 100, enemyHp = 100;
-        let playerX = 60, enemyX = 200;
-        let isAttacking = false;
-        let animationFrameId = null;
-
-        function handleStartClick() {
-            const count = parseInt(localStorage.getItem('drawingCount') || '0');
-            if (count >= 1) {
-                document.getElementById('adModal').classList.remove('hidden');
-            } else {
-                switchView('view-upload');
-            }
-        }
-
-        function closeAdModal() {
-            document.getElementById('adModal').classList.add('hidden');
-        }
-
-        function watchAd() {
-            closeAdModal();
-            localStorage.setItem('drawingCount', '0');
-            switchView('view-upload');
-        }
-
-        function switchView(viewId) {
-            document.getElementById('view-home').classList.add('hidden');
-            document.getElementById('view-upload').classList.add('hidden');
-            document.getElementById('view-game').classList.add('hidden');
-            document.getElementById(viewId).classList.remove('hidden');
-        }
-
-        function onImageSelected(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        characterImage = img;
-                        document.getElementById('imagePreview').src = e.target.result;
-                        document.getElementById('previewContainer').classList.remove('hidden');
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function goToGame() {
-            let count = parseInt(localStorage.getItem('drawingCount') || '0');
-            localStorage.setItem('drawingCount', count + 1);
-
-            document.getElementById('displayCharName').innerText = "マイキャラ";
-
-            switchView('view-game');
-            startBattle();
-        }
-
-        function startBattle() {
-            playerHp = 100;
-            enemyHp = 100;
-            playerX = 60;
-            enemyX = 200;
-            updateHpDisplay();
-
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-
-            function loop() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // 背景ステージ
-                ctx.fillStyle = "#312e81";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#4338ca";
-                ctx.fillRect(0, 180, canvas.width, 60); // 床
-
-                // プレイヤーキャラ描画
-                if (characterImage) {
-                    ctx.drawImage(characterImage, playerX, 110, 60, 60);
-                } else {
-                    ctx.fillStyle = "#ec4899";
-                    ctx.fillRect(playerX, 110, 50, 50);
-                }
-
-                // 敵キャラ描画
-                ctx.fillStyle = "#ef4444";
-                ctx.beginPath();
-                ctx.arc(enemyX + 25, 145, 25, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = "#fff";
-                ctx.font = "12px sans-serif";
-                ctx.fillText("敵ボス", enemyX + 10, 105);
-
-                animationFrameId = requestAnimationFrame(loop);
-            }
-
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            loop();
-        }
-
-        function playerAttack() {
-            if (isAttacking) return;
-            isAttacking = true;
-            playerX += 40;
-
-            setTimeout(() => {
-                enemyHp = Math.max(0, enemyHp - 20);
-                updateHpDisplay();
-                playerX -= 40;
-                isAttacking = false;
-                checkBattleEnd();
-                if (enemyHp > 0) enemyTurn();
-            }, 200);
-        }
-
-        function playerSpecial() {
-            if (isAttacking) return;
-            isAttacking = true;
-            playerX += 70;
-
-            setTimeout(() => {
-                enemyHp = Math.max(0, enemyHp - 45);
-                updateHpDisplay();
-                playerX -= 70;
-                isAttacking = false;
-                checkBattleEnd();
-                if (enemyHp > 0) enemyTurn();
-            }, 300);
-        }
-
-        function enemyTurn() {
-            setTimeout(() => {
-                playerHp = Math.max(0, playerHp - 15);
-                updateHpDisplay();
-                checkBattleEnd();
-            }, 600);
-        }
-
-        function updateHpDisplay() {
-            document.getElementById('playerHp').innerText = playerHp;
-            document.getElementById('enemyHp').innerText = enemyHp;
-        }
-
-        function checkBattleEnd() {
-            if (enemyHp <= 0) {
-                alert("🎉 ゆうしゃのしょうり！ おめでとう！");
-                backToHome();
-            } else if (playerHp <= 0) {
-                alert("💥 まけてしまった… もういちどちょうせんしよう！");
-                backToHome();
-            }
-        }
-
-        function backToHome() {
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            switchView('view-home');
-        }
-    </script>
-</body>
-</html>
+        let characterAudio = null;
+        let playerHp = 100, enemy
