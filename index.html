@@ -29,9 +29,9 @@
         <div id="view-home" class="flex flex-col items-center w-full">
             <div class="text-6xl mb-4 animate-bounce">🎨⚔️</div>
             <p class="text-center text-gray-600 mb-6 font-bold text-sm">
-                かいた絵の写真を撮るか、画像を選ぶよ！<br>音声で名前をつけてバトルしよう！
+                かいた絵の写真を撮るか選んで、<br>音声で名前をつけてバトルしよう！
             </p>
-            <button onclick="goToUpload()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
+            <button onclick="handleStartClick()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xl py-4 rounded-full shadow-lg transform active:scale-95 transition">
                 ゲームをはじめる！
             </button>
         </div>
@@ -40,15 +40,13 @@
         <div id="view-upload" class="hidden flex flex-col items-center w-full">
             <h2 class="text-xl font-bold text-indigo-600 mb-3">キャラをしょうかいしてね！</h2>
             
-            <!-- 写真を撮る or 画像を選ぶ の選択ボタン -->
+            <!-- 写真選択・カメラ撮影ボタン -->
             <div class="flex gap-2 w-full mb-4">
-                <!-- カメラ撮影用 -->
                 <label class="flex-1 border-2 border-dashed border-pink-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-pink-50 cursor-pointer hover:bg-pink-100 transition shadow-sm">
                     <span class="text-3xl mb-1">📷</span>
                     <span class="text-xs font-bold text-pink-500">写真を撮る</span>
                     <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="onImageSelected(event)">
                 </label>
-                <!-- 既存画像選択用 -->
                 <label class="flex-1 border-2 border-dashed border-indigo-300 rounded-2xl p-4 flex flex-col items-center justify-center bg-indigo-50 cursor-pointer hover:bg-indigo-100 transition shadow-sm">
                     <span class="text-3xl mb-1">🖼️</span>
                     <span class="text-xs font-bold text-indigo-500">画像を選ぶ</span>
@@ -58,9 +56,7 @@
 
             <!-- プレビューと音声入力 -->
             <div id="previewContainer" class="hidden flex flex-col items-center w-full">
-                <div class="mb-3 relative">
-                    <img id="imagePreview" class="w-28 h-28 object-contain border-2 border-indigo-300 rounded-xl bg-white shadow-md">
-                </div>
+                <img id="imagePreview" class="w-24 h-24 object-contain border-2 border-indigo-300 rounded-xl bg-white shadow-md mb-3">
                 
                 <!-- 音声入力エリア -->
                 <div class="w-full bg-indigo-50 rounded-2xl p-3 mb-4 flex flex-col items-center">
@@ -111,6 +107,23 @@
 
     </main>
 
+    <!-- リワード広告ポップアップモック（2回目以降用） -->
+    <div id="adModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
+            <div class="text-4xl mb-2">📺</div>
+            <h3 class="text-lg font-extrabold text-gray-800 mb-2">もっとあそぼう！</h3>
+            <p class="text-xs text-gray-500 mb-6">
+                2回目以降に新しいキャラを作るには、動画をみてね！（モック広告）
+            </p>
+            <button onclick="watchAd()" class="w-full bg-green-500 hover:bg-green-600 text-white font-extrabold py-3 rounded-full shadow-md mb-2">
+                ▶ 動画をみたよ！（すすむ）
+            </button>
+            <button onclick="closeAdModal()" class="text-gray-400 text-xs font-bold py-1">
+                やめる
+            </button>
+        </div>
+    </div>
+
     <footer class="w-full max-w-md text-center text-xs text-gray-500 py-2">
         &copy; 2026 おえかきバトル プロトタイプ
     </footer>
@@ -123,7 +136,22 @@
         let isAttacking = false;
         let animationFrameId = null;
 
-        function goToUpload() {
+        function handleStartClick() {
+            const count = parseInt(localStorage.getItem('drawingCount') || '0');
+            if (count >= 1) {
+                document.getElementById('adModal').classList.remove('hidden');
+            } else {
+                switchView('view-upload');
+            }
+        }
+
+        function closeAdModal() {
+            document.getElementById('adModal').classList.add('hidden');
+        }
+
+        function watchAd() {
+            closeAdModal();
+            localStorage.setItem('drawingCount', '0');
             switchView('view-upload');
         }
 
@@ -180,6 +208,9 @@
         }
 
         function goToGame() {
+            let count = parseInt(localStorage.getItem('drawingCount') || '0');
+            localStorage.setItem('drawingCount', count + 1);
+
             const nameInput = document.getElementById('charNameInput').value;
             document.getElementById('displayCharName').innerText = nameInput ? nameInput : "マイキャラ";
 
@@ -273,7 +304,6 @@
             document.getElementById('enemyHp').innerText = enemyHp;
         }
 
-        // 勝敗判定
         function checkBattleEnd() {
             if (enemyHp <= 0) {
                 alert("🎉 ゆうしゃのしょうり！ おめでとう！");
